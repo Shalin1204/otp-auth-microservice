@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>OTP Login Demo</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        max-width: 420px;
+        margin: 40px auto;
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid #ddd;
+      }
+      h1 {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+      }
+      label {
+        display: block;
+        margin-top: 12px;
+        margin-bottom: 4px;
+        font-weight: 500;
+      }
+      input {
+        width: 100%;
+        padding: 8px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+      }
+      button {
+        margin-top: 12px;
+        padding: 8px 14px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+      }
+      button.primary {
+        background: #2563eb;
+        color: white;
+      }
+      button.secondary {
+        background: #e5e7eb;
+      }
+      #result {
+        margin-top: 16px;
+        background: #f9fafb;
+        border-radius: 6px;
+        padding: 8px;
+        font-size: 0.9rem;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>OTP Login Demo</h1>
+    <p>Backend: Firebase Functions + Firestore</p>
+
+    <label for="phone">Phone</label>
+    <input id="phone" placeholder="+911234567890" />
+
+    <button class="primary" onclick="sendOtp()">Send OTP</button>
+
+    <label for="otp">OTP</label>
+    <input id="otp" placeholder="1234" />
+
+    <button class="secondary" onclick="verifyOtp()">Verify OTP</button>
+
+    <pre id="result"></pre>
+
+    <script>
+      const baseUrl =
+        "https://us-central1-ecom-bot-firebase.cloudfunctions.net";
+
+      async function sendOtp() {
+        const phone = document.getElementById("phone").value.trim();
+        if (!phone) {
+          show("Enter phone number");
+          return;
+        }
+
+        show("Sending OTP...");
+        const res = await fetch(`${baseUrl}/otpSend`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone }),
+        });
+        const text = await res.text();
+        show(text);
+      }
+
+      async function verifyOtp() {
+        const phone = document.getElementById("phone").value.trim();
+        const otp = document.getElementById("otp").value.trim();
+        if (!phone || !otp) {
+          show("Enter phone and OTP");
+          return;
+        }
+
+        show("Verifying...");
+        const res = await fetch(`${baseUrl}/otpVerify`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone, otp }),
+        });
+        const text = await res.text();
+        show(text);
+      }
+
+      function show(msg) {
+        document.getElementById("result").textContent = msg;
+      }
+    </script>
+  </body>
+</html>
